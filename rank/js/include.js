@@ -38,12 +38,23 @@ async function insertPartialHTML(filename) {
     let matches = html.match(/<script.+?src=["'].+?["'].*?><\/script>/g);
 
     if (matches != null) {
-        matches.forEach(each => {
+        matches.forEach(async each => {
             let target = each.match(/<script.+?src=["'](.+?)["'].*?><\/script>/);
 
-            let imported = document.createElement('script');
-            imported.src = target[1];
-            content.appendChild(imported);
+            let s = document.createElement('script');
+            s.type = "text/javascript";
+
+            let script = await fetch(target[1]).then(
+                r=>r.text()
+            );
+            
+            s.innerHTML = `
+            (function(){
+                ${script}
+            })();
+            `;
+
+            content.appendChild(s);
         });
     }
 }

@@ -55,7 +55,10 @@ makeSVG("text", {
     y: 40
 });
 
+let a = 1;
+function renderContent() {
 
+}
 // makeSVG("image", {
 //     "xlink:href": "https://kater.me/assets/avatars/lK37NSjp4n45nrh8.png",
 //     width: "50px",
