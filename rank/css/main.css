@@ -69,7 +69,7 @@ div#container {
 }
 
 div#svgContainer {
-    width: 100vw;
+    width: 100%;
     overflow-x: scroll;
 }
 
