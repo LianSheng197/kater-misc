@@ -58,7 +58,7 @@ function translate() {
         translated = translated.replace(/\ +/g, " ");
 
         // 基本檢查：只能抓出非法字元，無法檢查結構
-        let checkLegal = translated.match(/([^\ A-Z0-9<>=!\(\)])/);
+        let checkLegal = translated.match(/([^\ \/A-Z0-9<>=!\(\)])/);
 
         if (checkLegal != null) {
             condition.focus();
