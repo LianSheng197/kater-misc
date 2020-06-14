@@ -13,8 +13,8 @@
 <div class="parameter" id="orderType">
     <span class="title">排序方法</span>
     <select>
-        <option value="asc">遞增</option>
         <option value="desc">遞減</option>
+        <option value="asc">遞增</option>
     </select>
 </div>
 <div class="parameter" id="limit">
@@ -67,6 +67,10 @@
 </div>
 
 <h3>排行榜</h3>
-<svg id="test" width=950 height=1000></svg>
+<div id="svgContainer">
+    <svg id="test" width=850 height=100></svg>
+</div>
 
-<script src="js/main.js"></script>
+<input id="download" type="button" value="下載成圖片" style="display: none;">
+
+<script src="js/rank.js"></script>
