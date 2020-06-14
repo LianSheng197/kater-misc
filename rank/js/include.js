@@ -33,6 +33,19 @@ async function insertPartialHTML(filename) {
         `;
         content.appendChild(s);
     }
+
+    // 添加 script[src]
+    let matches = html.match(/<script.+?src=["'].+?["'].*?><\/script>/g);
+
+    if (matches != null) {
+        matches.forEach(each => {
+            let target = each.match(/<script.+?src=["'](.+?)["'].*?><\/script>/);
+
+            let imported = document.createElement('script');
+            imported.src = target[1];
+            content.appendChild(imported);
+        });
+    }
 }
 
-insertPartialHTML("index");
+insertPartialHTML("rank");
