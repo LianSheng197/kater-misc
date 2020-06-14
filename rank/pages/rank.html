@@ -1,0 +1,72 @@
+<h3>設定參數</h3>
+
+<div class="parameter" id="orderColumn">
+    <span class="title">排序依據</span>
+    <select>
+        <option value="points">總推數</option>
+        <option value="discussions">討論數</option>
+        <option value="posts">貼文數</option>
+        <option value="changeNameCount">改名次數</option>
+        <option value="rate">貼文數 / 總推數</option>
+    </select>
+</div>
+<div class="parameter" id="orderType">
+    <span class="title">排序方法</span>
+    <select>
+        <option value="asc">遞增</option>
+        <option value="desc">遞減</option>
+    </select>
+</div>
+<div class="parameter" id="limit">
+    <span class="title">單頁筆數</span>
+    <select>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+    </select>
+</div>
+<div class="parameter full" id="condition">
+    <span class="title">過濾條件</span>
+    <hr>
+    <span>快速新增文字（點擊下方按鈕）</span>
+    <div class="fast2add">
+        <span class="column">UID</span>
+        <span class="column">總推數</span>
+        <span class="column">討論數</span>
+        <span class="column">貼文數</span>
+        <span class="column">改名次數</span>
+        <span class="column">貼文數 / 總推數</span>
+        <hr>
+        <span class="operator">且</span>
+        <span class="operator">或</span>
+        <hr>
+        <span class="comparison">=</span>
+        <span class="comparison">!=</span>
+        <span class="comparison">></span>
+        <span class="comparison">>=</span>
+        <span class="comparison"><</span>
+        <span class="comparison"><=</span>
+        <hr>
+        <span class="special">(</span>
+        <span class="special">)</span>
+        <hr>
+        <span class="number">0</span>
+        <span class="number">1</span>
+        <span class="number">2</span>
+        <span class="number">3</span>
+        <span class="number">4</span>
+        <span class="number">5</span>
+        <span class="number">6</span>
+        <span class="number">7</span>
+        <span class="number">8</span>
+        <span class="number">9</span>
+    </div>
+    <input type="text" placeholder="請輸入過濾條件，或點擊上方按鈕快速填入">
+    <input type="button" value="查詢">
+</div>
+
+<h3>排行榜</h3>
+<svg id="test" width=950 height=1000></svg>
+
+<script src="js/main.js"></script>
