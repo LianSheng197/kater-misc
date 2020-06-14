@@ -1,0 +1,24 @@
+/* 目前手機版 navbar 無法置頂，原因不明 */
+@media screen and (max-width: 768px) {
+    nav#navbar {
+        padding: 0px 4vw;
+    }
+
+    a.navItem {
+        padding: 0px 10px;
+    }
+
+    div#container {
+        margin: initial;
+    }
+
+    div.parameter {
+        display: inline-block;
+        width: calc(99% - 2vw - 2rem);
+        margin-left: 1%;
+        margin-bottom: 1%;
+        padding: 1rem;
+        border: 2px solid #c1c8c8;
+        border-radius: 8px;
+    }
+}
