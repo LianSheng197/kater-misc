@@ -64,8 +64,13 @@ a.navItem:hover {
 }
 
 div#container {
-    margin-left: calc(50vw - 475px);
-    margin-right: calc(50vw - 475px);
+    margin-left: calc(50vw - 425px);
+    margin-right: calc(50vw - 425px);
+}
+
+div#svgContainer {
+    width: 100vw;
+    overflow-x: scroll;
 }
 
 div.parameter {
