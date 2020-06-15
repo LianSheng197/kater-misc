@@ -59,4 +59,4 @@ async function insertPartialHTML(filename) {
     }
 }
 
-insertPartialHTML("rank");
+insertPartialHTML("help");
