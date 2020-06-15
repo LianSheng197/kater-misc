@@ -41,7 +41,7 @@ function translate() {
         改名次數: "F",
         討論數: "G",
         貼文數: "H",
-        "貼文數 / 總推數": "(C/H)",
+        平均每篇貼文推數: "(C/H)",
         且: "AND",
         或: "OR"
     };
@@ -76,6 +76,9 @@ function translate() {
 
 
 async function renderContent(condition, offset = 0) {
+    searchBtn.setAttribute("disabled", "disabled");
+    searchBtn.classList.add("disabled");
+
     let count = 1;
     let orderColumn = document.querySelector("div#orderColumn select").value;
     let orderType = document.querySelector("div#orderType select").value == "asc" ? "" : "-";
@@ -96,7 +99,8 @@ async function renderContent(condition, offset = 0) {
     msg("正在繪製資料");
     if (rawData == "ERROR") {
         alert("取得資料時出錯，請再試一次");
-        msg("就緒");
+    } else if (rawData == "#VALUE!") {
+        alert("過濾篩選條件有誤，請檢查格式");
     } else {
         // 背景
         makeSVG("rect", {
@@ -149,7 +153,7 @@ async function renderContent(condition, offset = 0) {
             y: 40
         });
         makeSVG("text", {
-            text: "總推數 / 貼文",
+            text: "平均每篇貼文推數",
             fill: "black",
             x: 730,
             y: 40
@@ -158,6 +162,10 @@ async function renderContent(condition, offset = 0) {
         let data = rawData.split(",");
 
         document.querySelector("svg").setAttribute("height", (data.length / 8) * 50 + 20);
+
+        if (window.innerWidth >= 768) {
+            document.querySelector("svg").setAttribute("width", document.querySelector("#svgContainer").clientWidth);
+        }
 
         // 跳過第一列（標題）
         for (let i = 8; i < data.length; i += 8) {
@@ -239,6 +247,8 @@ async function renderContent(condition, offset = 0) {
     }
 
     msg("就緒");
+    searchBtn.removeAttribute("disabled");
+    searchBtn.classList.remove("disabled");
 
     // 暫時無法排除 CORS 錯誤
     // downloadBtn.style.display = "initial";
@@ -270,7 +280,7 @@ function measureText(pText, pFontSize = "1rem") {
 
 function toDataURL(src, outputFormat) {
     let img = new Image();
-    
+
     img.onload = function () {
         let canvas = document.createElement('CANVAS');
         let ctx = canvas.getContext('2d');
