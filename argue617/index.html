@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吵架聖經</title>
+    <style>
+        body {
+            width: 96vw;
+            max-width: 768px;
+            height: 96vh;
+            padding-left: calc(50vw - 384px);
+            padding-right: calc(50vw - 384px);
+            overflow: hidden;
+
+            background-color: rgb(255, 240, 240);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="Slogan"
+        style="z-index: -1; position: fixed; font-size: 20pt; color: #999999; text-align: justify; margin-left: 6px; margin-right: 6px;">
+    </div>
+    <p>想成爲吵架達人嗎？那你來對地方了！<br>熟悉這類用語，包準成爲吵架王！</p>
+
+    <hr>
+
+    <h3>經典範本</h3>
+
+    <p id="example"></p>
+
+    <script>
+        (async function () {
+            let raw = await fetch("example.txt").then(r => r.text());
+            let ex = raw.split("\n");
+            let final = ex.pop();
+            let p = document.querySelector("p#example");
+            p.innerHTML = r(ex, 14);
+
+            bg(final);
+
+            function r(a, l) {
+                const s = a.sort(() => 0.5 - Math.random());
+
+                let t = "";
+                for (let i = 0; i < l; i++) {
+                    t += s[i];
+                    t += "<br>";
+                }
+                return t;
+            }
+
+            function bg(text) {
+                let canvas = document.createElement("canvas");
+                let fontSize = 24;
+                canvas.setAttribute('height', fontSize + 4);
+                let context = canvas.getContext('2d');
+                context.fillStyle = 'rgba(0,0,0,0.1)';
+                context.font = fontSize + 'px sans-serif';
+                context.fillText(text, 0, fontSize);
+
+                document.body.style.backgroundImage = "url(" + canvas.toDataURL("image/png") + ")";
+            }
+        })();
+    </script>
+</body>
+
+</html>
