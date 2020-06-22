@@ -1,11 +1,11 @@
 /* 目前手機版 navbar 無法置頂，原因不明 */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 900px) {
     nav#navbar {
         padding: 0px 4vw;
     }
 
     a.navItem {
-        padding: 0px 10px;
+        padding: 0px 6px;
     }
 
     div#container {
