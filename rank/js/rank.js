@@ -9,7 +9,7 @@ let userTotalSpan = document.querySelector("#userTotal");
 let pageTotalSpan = document.querySelector("#pageTotal");
 
 let nowCondition = "";
-let nowPage = 0;
+let nowPage = 1;
 let nowTotalPage = 0;
 
 // 查詢按鈕：點擊事件
@@ -34,6 +34,7 @@ document.querySelectorAll("div.fast2add span.number").forEach(each => {
 
 function translate() {
     msg("正在檢查格式");
+    nowPage = 1;
 
     const FIELD_HUMAN = {
         UID: "A",
@@ -76,7 +77,7 @@ function translate() {
 }
 
 
-async function renderContent(condition, page = 0) {
+async function renderContent(condition, page = 1) {
     searchBtn.setAttribute("disabled", "disabled");
     searchBtn.classList.add("disabled");
     pagePrevBtn.setAttribute("disabled", "disabled");
@@ -90,7 +91,7 @@ async function renderContent(condition, page = 0) {
     let _sortBy = `${orderType}${orderColumn}`;
     let _limit = document.querySelector("div#limit select").value;
     let _condition = condition;
-    let _offset = page * _limit;
+    let _offset = (page - 1) * _limit;
 
     let baseURL = "https://script.google.com/macros/s/AKfycbxejz2Zqgt1VyWM-0jWXdi8fIj9Nff4fLEjSj8FDS-CBG9Bu5bE/exec";
 
@@ -266,12 +267,12 @@ async function renderContent(condition, page = 0) {
         pagePrevBtn.removeAttribute("disabled");
         pagePrevBtn.classList.remove("disabled");
     }
-    if (nowTotalPage > 1) {
+    if (nowTotalPage > 1 && nowPage < nowTotalPage) {
         pageNextBtn.removeAttribute("disabled");
         pageNextBtn.classList.remove("disabled");
     }
 
-    pageNowSpan.innerText = nowPage + 1;
+    pageNowSpan.innerText = nowPage;
 
     // 暫時無法排除 CORS 錯誤
     // downloadBtn.style.display = "initial";
