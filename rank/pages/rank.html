@@ -69,8 +69,14 @@
 </div>
 
 <h3>排行榜</h3>
+<div id="pageControl">
+    <input type="button" class="simple disabled" id="pagePrev" value="上一頁" disabled>
+    <span id="pageNow">0</span>
+    <input type="button" class="simple disabled" id="pageNext" value="下一頁" disabled>
+    <span class="right">共 <span id="userTotal">x</span> 筆，共 <span id="pageTotal">y</span> 頁</span>
+</div>
 <div id="svgContainer">
-    <svg id="test" width=900 height=100></svg>
+    <svg id="test" width=800 height=100></svg>
 </div>
 
 <input id="download" type="button" value="下載成圖片" style="display: none;">

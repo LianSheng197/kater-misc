@@ -2,6 +2,16 @@ let condition = document.querySelector("div#condition input[type=text]");
 let searchBtn = document.querySelector("div#condition input[type=button]");
 let downloadBtn = document.querySelector("input#download");
 
+let pagePrevBtn = document.querySelector("#pagePrev");
+let pageNextBtn = document.querySelector("#pageNext");
+let pageNowSpan = document.querySelector("#pageNow");
+let userTotalSpan = document.querySelector("#userTotal");
+let pageTotalSpan = document.querySelector("#pageTotal");
+
+let nowCondition = "";
+let nowPage = 0;
+let nowTotalPage = 0;
+
 // 查詢按鈕：點擊事件
 searchBtn.addEventListener("click", translate);
 
@@ -24,16 +34,6 @@ document.querySelectorAll("div.fast2add span.number").forEach(each => {
 
 function translate() {
     msg("正在檢查格式");
-    const FIELD = {
-        uid: "A",
-        username: "B",
-        points: "C",
-        changeNameCount: "F",
-        discussions: "G",
-        posts: "H",
-        avatarUrl: "I",
-        rate: "(C/H)"
-    };
 
     const FIELD_HUMAN = {
         UID: "A",
@@ -71,13 +71,18 @@ function translate() {
     }
 
     console.log(translated);
+    nowCondition = translated;
     renderContent(translated);
 }
 
 
-async function renderContent(condition, offset = 0) {
+async function renderContent(condition, page = 0) {
     searchBtn.setAttribute("disabled", "disabled");
     searchBtn.classList.add("disabled");
+    pagePrevBtn.setAttribute("disabled", "disabled");
+    pagePrevBtn.classList.add("disabled");
+    pageNextBtn.setAttribute("disabled", "disabled");
+    pageNextBtn.classList.add("disabled");
 
     let count = 1;
     let orderColumn = document.querySelector("div#orderColumn select").value;
@@ -85,7 +90,7 @@ async function renderContent(condition, offset = 0) {
     let _sortBy = `${orderType}${orderColumn}`;
     let _limit = document.querySelector("div#limit select").value;
     let _condition = condition;
-    let _offset = offset;
+    let _offset = page * _limit;
 
     let baseURL = "https://script.google.com/macros/s/AKfycbxejz2Zqgt1VyWM-0jWXdi8fIj9Nff4fLEjSj8FDS-CBG9Bu5bE/exec";
 
@@ -100,7 +105,7 @@ async function renderContent(condition, offset = 0) {
     if (rawData == "ERROR") {
         alert("取得資料時出錯，請再試一次");
     } else if (rawData == "#VALUE!") {
-        alert("過濾篩選條件有誤，請檢查格式");
+        alert("取得資料失敗，請檢查過濾條件格式");
     } else {
         // 背景
         makeSVG("rect", {
@@ -161,14 +166,21 @@ async function renderContent(condition, offset = 0) {
 
         let data = rawData.split(",");
 
-        document.querySelector("svg").setAttribute("height", (data.length / 8) * 50 + 20);
+        document.querySelector("svg").setAttribute("height", (data.length / 9) * 50 + 20);
 
         if (window.innerWidth >= 768) {
             document.querySelector("svg").setAttribute("width", document.querySelector("#svgContainer").clientWidth);
         }
 
+        let userTotal = data[9 * 2 - 1];
+        let pageTotal = Math.ceil(userTotal / _limit);
+        userTotalSpan.innerText = ` ${userTotal} `;
+        pageTotalSpan.innerText = ` ${pageTotal} `;
+
+        nowTotalPage = pageTotal;
+
         // 跳過第一列（標題）
-        for (let i = 8; i < data.length; i += 8) {
+        for (let i = 9; i < data.length; i += 9) {
             let y = 40 + 50 * count;
             let username = `（${data[i]}） ${data[i+1]}`;
 
@@ -186,7 +198,7 @@ async function renderContent(condition, offset = 0) {
             }
 
             makeSVG("text", {
-                text: count,
+                text: count + (_offset),
                 fill: "black",
                 x: 10,
                 y: y
@@ -250,9 +262,39 @@ async function renderContent(condition, offset = 0) {
     searchBtn.removeAttribute("disabled");
     searchBtn.classList.remove("disabled");
 
+    if (nowPage > 1) {
+        pagePrevBtn.removeAttribute("disabled");
+        pagePrevBtn.classList.remove("disabled");
+    }
+    if (nowTotalPage > 1) {
+        pageNextBtn.removeAttribute("disabled");
+        pageNextBtn.classList.remove("disabled");
+    }
+
+    pageNowSpan.innerText = nowPage + 1;
+
     // 暫時無法排除 CORS 錯誤
     // downloadBtn.style.display = "initial";
 }
+
+function pageNextFunc() {
+    if (nowPage >= nowTotalPage) {
+        return;
+    } else {
+        renderContent(nowCondition, ++nowPage);
+    }
+}
+
+function pagePrevFunc() {
+    if (nowPage <= 1) {
+        return;
+    } else {
+        renderContent(nowCondition, --nowPage);
+    }
+}
+
+pagePrevBtn.addEventListener("click", pagePrevFunc);
+pageNextBtn.addEventListener("click", pageNextFunc);
 
 // 判斷文字寬度
 function measureText(pText, pFontSize = "1rem") {
