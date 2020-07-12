@@ -1,10 +1,14 @@
 // 觸發導入片段檔的事件註冊
-document.querySelectorAll("a[data-link]").forEach(each => {
-    each.addEventListener("click", () => {
-        let link = each.getAttribute("data-link");
-        insertPartialHTML(link);
+function init() {
+    document.querySelectorAll("a[data-link]").forEach(each => {
+        each.onclick = () => {
+            let link = each.getAttribute("data-link");
+            insertPartialHTML(link);
+        };
     });
-});
+}
+
+init();
 
 // 引入外部片段檔
 async function insertPartialHTML(filename) {
@@ -45,9 +49,9 @@ async function insertPartialHTML(filename) {
             s.type = "text/javascript";
 
             let script = await fetch(target[1]).then(
-                r=>r.text()
+                r => r.text()
             );
-            
+
             s.innerHTML = `
             (function(){
                 ${script}
@@ -59,4 +63,7 @@ async function insertPartialHTML(filename) {
     }
 }
 
-insertPartialHTML("help");
+(function () {
+    let defaultPage = document.querySelector("[data-default]").getAttribute("data-link");
+    insertPartialHTML(defaultPage);
+})();

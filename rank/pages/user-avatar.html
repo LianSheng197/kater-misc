@@ -1,0 +1,34 @@
+<h3>使用者</h3>
+
+<p>只列出有頭貼的使用者<br>資料固定於每日 4:49 AM 左右更新</p>
+<p>每頁列出 500 名使用者</p>
+
+<div id="pageControl">
+    <input type="button" class="simple disabled" id="pagePrev" value="上一頁" disabled>
+    <span id="pageNow">0</span>
+    <input type="button" class="simple disabled" id="pageNext" value="下一頁" disabled>
+    <span class="right">共 <span id="userTotal">x</span> 筆，共 <span id="pageTotal">y</span> 頁</span>
+</div>
+
+<table style="width: 100%; margin-top: 90px;">
+    <thead>
+        <tr>
+            <th style="width: 5rem;">UID</th>
+            <th style="width: 120px;">Avatar</th>
+            <th>Username</th>
+        </tr>
+    </thead>
+    <tbody id="userlist">
+        <tr>
+            <td colspan="3">正在讀取資料</td>
+        </tr>
+    </tbody>
+</table>
+
+<style>
+    tbody#userlist td {
+        padding: 10px;
+    }
+</style>
+
+<script src="js/user-avatar.js"></script>

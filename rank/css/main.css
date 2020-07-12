@@ -173,7 +173,8 @@ div#pageControl {
     flex-wrap: wrap;
     margin-bottom: 18px;
     width: 100%;
-    background: #cbeaff44;
+    max-width: 900px;
+    background-color: #cbeaff44;
     padding: 0px 5%;
 }
 

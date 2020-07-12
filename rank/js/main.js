@@ -23,9 +23,8 @@ function dateFormat(d){
     return datetime;
 }
 
-
 msg("就緒");
 
 // footer
-document.querySelector("span#version").innerText = "v0.7.0";
+document.querySelector("span#version").innerText = "v0.8.0";
 document.querySelector("span#lastModified").innerText = dateFormat(new Date(document.lastModified));
