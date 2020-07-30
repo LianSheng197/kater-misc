@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遺失的暱稱</title>
+</head>
+
+<body>
+    <p>原始資料只存到 7/23 04:46。<br> 7/24 因伺服器錯誤而沒有存到。</p>
+    <table>
+        <thead>
+            <th>UID</th>
+            <th>歷史暱稱</th>
+            <th>開始時間</th>
+            <th>結束時間</th>
+        </thead>
+        <tbody id="view"></tbody>
+    </table>
+    <script>
+        (async function () {
+            // 門檻：只篩出於 4/15 後改名的使用者
+            let threshold = (new Date("2020/04/15")).getTime() / 1000;
+            // 資料最後更新時間
+            let theEnd = 1595450793;
+
+            // 整理所有資料：[uid, Array(name), Array(time)]
+            let clearData = await fetch("./all.tsv").then(r => r.text()).then(r => {
+                let data = r.split(/\r?\n/).map(line => line.split("\t"));
+                data = data.map(d => {
+                    if (d[3] != "null") {
+                        let uid = d[0];
+                        let recentName = d[1];
+                        let regTime = d[2];
+                        let changeHistory = JSON.parse(d[3]);
+
+                        let nameHistory = [];
+                        let timeHistory = [regTime - 0];
+
+                        changeHistory.forEach(h => {
+                            let cn = Object.keys(h)[0];
+                            let ct = h[cn];
+
+                            if (ct > threshold) {
+                                nameHistory.push(cn);
+                                timeHistory.push(ct);
+                            }
+                        });
+
+                        nameHistory.push(recentName);
+
+                        if (nameHistory.length == 1) {
+                            return undefined;
+                        } else {
+                            nameHistory.shift();
+                            timeHistory.shift();
+
+                            return [uid, nameHistory, timeHistory];
+                        }
+                    } else {
+                        return [d[0],
+                            [d[1]],
+                            [d[2]]
+                        ];
+                    }
+                });
+
+                return data;
+            });
+
+            // 排除所有改名接在 4/15 之前的使用者
+            clearData = clearData.filter(d => d != undefined);
+
+            let tableRow = "";
+            clearData.forEach(user => {
+                let uid = user[0];
+                let name = user[1];
+                let time = user[2];
+                time.push(theEnd);
+                tableRow +=
+                    `<tr><td rowspan="${name.length}">${uid}</td><td>${name[0]}</td><td>${datetimeFormat(time[0])}</td><td>${datetimeFormat(time[1])}</td></tr>`;
+
+                name.shift();
+                time.shift();
+
+                for (let i = 0; i < name.length; i++) {
+                    let n = name[i];
+                    let s = datetimeFormat(time[i]);
+                    let e = datetimeFormat(time[i + 1]);
+
+                    tableRow += `<tr><td>${n}</td><td>${s}</td><td>${e}</td></tr>`;
+                }
+            });
+
+            document.querySelector("#view").innerHTML = tableRow;
+        })();
+
+        // timestamp -> YYYY-MM-DD[ HH:mm:ss]
+        function datetimeFormat(timestamp, dateOnly = false) {
+            let d = new Date(timestamp * 1000);
+            let yyyy = d.getFullYear();
+            let MM = `0${d.getMonth()+1}`.substr(-2);
+            let dd = `0${d.getDate()}`.substr(-2);
+            let hh = `0${d.getHours()}`.substr(-2);
+            let mm = `0${d.getMinutes()}`.substr(-2);
+            let ss = `0${d.getSeconds()}`.substr(-2);
+            let result = "";
+
+            if (dateOnly) {
+                result = `${yyyy}-${MM}-${dd}`;
+            } else {
+                result = `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
+            }
+
+            return result;
+        }
+    </script>
+
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+
+        tr:hover {
+            background-color: #ccc;
+        }
+    </style>
+</body>
+
+</html>
