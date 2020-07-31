@@ -1,0 +1,19 @@
+---
+# 我們至今仍不確定 User-Agent 是否會影響 Google 辨識機器人，請自行決定選填。
+User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"
+
+range:
+  # 備份文章編號範圍
+  min: 60000
+  max: 61000
+
+interval:
+  routine:
+    # 正常狀況下，兩筆備份的間隔時間範圍，單位毫秒
+    min: 15000
+    max: 40000
+  exception: 
+    # 遭遇 429 等非預期狀態，額外等待時間範圍，單位毫秒
+    min: 300000
+    max: 600000
+...
