@@ -17,7 +17,8 @@
 
 #### 執行
 ```bash
-python3 cacheCrawler.py <開始數字> <結束數字（不含）>
+# 執行前請務必注意 config.yml 設定是否正確
+python3 cacheCrawler.py
 ```
 
 ### 鳴謝
