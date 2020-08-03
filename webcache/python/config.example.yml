@@ -1,16 +1,27 @@
 ---
 range:
   # 備份文章編號範圍
-  min: 61078
-  max: 62000
+  min: 67000
+  max: 70000
 
 interval:
   routine:
     # 正常狀況下，兩筆備份的間隔時間範圍，單位毫秒
-    min: 15000
-    max: 40000
+    min: 100
+    max: 200
   exception: 
     # 遭遇 429 等非預期狀態，額外等待時間範圍，單位毫秒
     min: 300000
     max: 600000
+
+CORS Proxy:
+  # 使用 CORS Proxy 來達到多個 IP 請求資源，大幅提升效率
+  # 參考資源：
+  #     Heroku: https://stackoverflow.com/a/47085173/8595750 （可多個，一個免費帳號最多五個）
+  #     Cloudflare workers: https://github.com/Zibri/cloudflare-cors-anywhere （基本只能一個）
+  # 格式：
+  #     一行一個 CORS Proxy 前綴，前面要有 '-' 開頭、後面不可有逗號
+  #     參考前綴 "https://cors-anywhere.herokuapp.com/"，"https://test.cors.workers.dev/?"
+  #     留空 "" 表示不使用前綴，直接從本機向 webcache 請求
+  - ""
 ...
