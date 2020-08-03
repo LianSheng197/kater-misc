@@ -1,4 +1,8 @@
-webcache/python/windows
 webcache/curl/d
+webcache/python/windows
+webcache/python/test
 webcache/python/d
+webcache/python/translated
 webcache/python/log.txt
+webcache/python/progress.txt
+webcache/python/data.*
