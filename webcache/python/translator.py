@@ -162,7 +162,7 @@ Path("./translated/json").mkdir(parents=True, exist_ok=True)
 Path("./translated/markdown").mkdir(parents=True, exist_ok=True)
 
 for filename in filenames:
-    if True or not Path(f"./translated/json/{filename}.json").is_file():
+    if not Path(f"./translated/json/{filename}.json").is_file():
         raw = ""
         with open(f"{originHtml}/{filename}.html", "r", encoding="utf-8") as file:
             raw = file.read()
