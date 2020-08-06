@@ -51,6 +51,7 @@ def mdParser(element, noBreakLine=True):
             content = nospace(element.text)
             if noBreakLine:
                 content = content.replace("\n", "")
+                content = nospace(content)
                 md += f"{content}"
             else:
                 md += f"{content}"
@@ -58,6 +59,7 @@ def mdParser(element, noBreakLine=True):
             content = nospace(element)
             if noBreakLine:
                 content = content.replace("\n", "")
+                content = nospace(content)
                 md += f"{content}"
             else:
                 md += f"{content}"
@@ -197,11 +199,11 @@ for filename in filenames:
 
         flarumContent = soup.find("noscript", {"id": "flarum-content"})
 
-        postAuthor = flarumContent.findAll("h3")
         postBody = flarumContent.findAll("div", {"class": "Post-body"})
+        postAuthor = list(map(lambda x: x.find_previous_sibling("h3"), postBody))
 
         index = 0
-        while(index < len(postAuthor)):
+        while(index < len(postBody)):
             body = postBody[index]
 
             body = body.decode_contents()
