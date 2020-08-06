@@ -1,6 +1,8 @@
 import json
 import re
 import sys
+import time
+import datetime
 from pathlib import Path
 from os import listdir
 from os.path import isfile, join
@@ -40,7 +42,7 @@ def nospace(string):
     return string
 
 
-def DFSParser(element, noBreakLine=True):
+def mdParser(element, noBreakLine=True):
     global md
 
     # 沒有子節點
@@ -76,54 +78,65 @@ def DFSParser(element, noBreakLine=True):
                             content = nospace(e.text).replace("\n", "")
                             md += f"[{content}]({getLinkUrl(e)})"
                     elif(e.name == "p"):
-                        DFSParser(e)
+                        mdParser(e)
                         md += "\n\n"
                     elif(e.name == "iframe"):
                         if e.has_attr("src"):
                             src = e["src"]
 
                             if("www.youtube.com" in src):
+                                # https://www.youtube.com/watch?v=<id>
                                 src = src.replace("embed/", "watch?v=")
                                 md += src
                             elif("twitter.min.html" in src):
-                                # https://twitter.com/x/status/:id
+                                # https://twitter.com/x/status/<id>
                                 id = src.split("#")[1]
                                 md += f"https://twitter.com/x/status/{id}"
                             elif("facebook.min.html" in src):
-                                #
+                                # https://www.facebook.com/x/posts/<id>
+                                # https://www.facebook.com/watch/?v=<id>
+                                id = src.split("#")[1]
 
-                                md += src
+                                if "video" in id:
+                                    id = id.replace("video", "")
+                                    md += f"https://www.facebook.com/watch/?v={id}"
+                                elif "post" in id:
+                                    id = id.replace("post", "")
+                                    md += f"https://www.facebook.com/x/posts/{id}"
+                                else:
+                                    md += f"https://www.facebook.com/x/posts/{id}"
                             else:
+                                # SoundCloud 無須轉換
                                 md += src
 
                             md += "\n"
 
                     elif(e.name == "blockquote"):
                         md += "[quote]\n"
-                        DFSParser(e)
+                        mdParser(e)
                         md += "[/quote]\n\n"
                     elif(e.name in ["code", "pre"]):
                         if(e.name == "pre"):
-                            DFSParser(e, noBreakLine=False)
+                            mdParser(e, noBreakLine=False)
                         else:
                             if(e.parent.name == "pre"):
                                 if(e.has_attr("class")):
                                     lang = e["class"][0].split("-")[1]
                                     md += f"```{lang}\n"
-                                    DFSParser(e, noBreakLine=False)
+                                    mdParser(e, noBreakLine=False)
                                     md += "\n```\n"
                             else:
                                 md += f" `"
-                                DFSParser(e)
+                                mdParser(e)
                                 md += "` "
                     elif(e.name == "br"):
                         md += "\n"
                     elif(e.name == "strong"):
                         md += "**"
-                        DFSParser(e)
+                        mdParser(e)
                         md += "**"
                     else:
-                        DFSParser(e)
+                        mdParser(e)
 
             # e 不是節點（只是文字）
             else:
@@ -143,72 +156,89 @@ translatedHtml = "./translated/html"
 files = [f for f in listdir(originHtml) if isfile(join(originHtml, f))]
 
 filenames = list(map(lambda x: x.split(".")[0], files))
+filenames = sorted(filenames)
 
 Path("./translated/json").mkdir(parents=True, exist_ok=True)
 Path("./translated/markdown").mkdir(parents=True, exist_ok=True)
-Path("./translated/html").mkdir(parents=True, exist_ok=True)
 
-index = 1
-if not Path(f"./translated/json/{filenames[index]}").is_file():
-    raw = ""
-    # with open(f"{originHtml}/{filenames[index]}.html", "r", encoding="utf-8") as file:
-    # 僅測試用
-    with open(f"{originHtml}/71476.html", "r", encoding="utf-8") as file:
-        raw = file.read()
+for filename in filenames:
+    if True or not Path(f"./translated/json/{filename}.json").is_file():
+        raw = ""
+        with open(f"{originHtml}/{filename}.html", "r", encoding="utf-8") as file:
+            raw = file.read()
 
-    soup = BeautifulSoup(raw, "html.parser")
+        soup = BeautifulSoup(raw, "html.parser")
 
-    baseUrl = soup.find("base")["href"]
-    title = soup.find("title").text.replace("- 卡特 Kater", "").replace("\n", "")
-    title = re.sub(r"\ +", " ", title)
+        baseUrl = ""
+        try:
+            baseUrl = soup.find("base")["href"]
+        except:
+            baseUrl = f"https://kater.me/d/{filename}"
 
-    content = []
+        
+        cacheTime = ""
+        try:    
+            cacheTime = soup.select_one("div#bN015htcoyT__google-cache-hdr span:nth-child(2)").text.replace("\n", "")
 
-    flarumContent = soup.find("noscript", {"id": "flarum-content"})
+            if(re.findall(r'[\u4e00-\u9fff]+', cacheTime)):
+                cacheTime = re.search(r"2020.+?GMT", cacheTime).group(0)
+                cacheTime = int(time.mktime(datetime.datetime.strptime(cacheTime, "%Y年%m月%d日 %H:%M:%S GMT").timetuple()))
+            else:
+                cacheTime = re.search(r"appeared\ on\ (.+?GMT)", cacheTime).group(1)
+                cacheTime = int(time.mktime(datetime.datetime.strptime(cacheTime, "%b %d, %Y %H:%M:%S GMT").timetuple()))
+        except:
+            cacheTime = "undefined"
+        
+        title = soup.find("h2").text.replace("\n", "")
+        title = re.sub(r"^\ +", "", title)
+        title = re.sub(r"\ +$", "", title)
 
-    postAuthor = flarumContent.findAll("h3")
-    postBody = flarumContent.findAll("div", {"class": "Post-body"})
+        content = []
 
-    index = 0
-    while(index < len(postAuthor)):
-        body = postBody[index]
+        flarumContent = soup.find("noscript", {"id": "flarum-content"})
 
-        body = body.decode_contents()
-        body = re.sub(r"\ +", " ", body)
-        author = postAuthor[index]
-        author = author.text.replace(" ", "").replace("\n", "")
+        postAuthor = flarumContent.findAll("h3")
+        postBody = flarumContent.findAll("div", {"class": "Post-body"})
 
-        temp = {
-            "author": author,
-            "body": body
+        index = 0
+        while(index < len(postAuthor)):
+            body = postBody[index]
+
+            body = body.decode_contents()
+            body = re.sub(r"\ +", " ", body)
+            author = postAuthor[index]
+            author = author.text.replace(" ", "").replace("\n", "")
+
+            temp = {
+                "author": author,
+                "body": body
+            }
+
+            content.append(temp)
+
+            index += 1
+
+        #### All data ####
+        data = {
+            "cacheTime": cacheTime,
+            "baseUrl": baseUrl,
+            "title": title,
+            "content": content
         }
 
-        content.append(temp)
+        # Translated: JSON
+        with open(f"./translated/json/{filename}.json", "w") as f:
+            json.dump(data, f, ensure_ascii=False)
 
-        index += 1
+        # Translated: Markdown
+        # 採用 DFS 解析元素
+        md = f"### {data['title']} `{data['baseUrl']}`\n\n"
+        i = 0
+        while i < len(data["content"]):
+            element = BeautifulSoup(data["content"][i]["body"], "html.parser")
+            md += f"\n***\n#### {data['content'][i]['author']}\n"
+            mdParser(element)
+            i += 1
 
-    #### All data ####
-    data = {
-        "baseUrl": baseUrl,
-        "title": title,
-        "content": content
-    }
-
-    # Translated: JSON
-    with open("data.json", "w") as f:
-        json.dump(data, f, ensure_ascii=False)
-
-    # Translated: Markdown
-    # 採用 DFS 解析元素
-    md = f"### {data['title']} `{data['baseUrl']}`\n\n"
-    i = 0
-    while i < len(data["content"]):
-        element = BeautifulSoup(data["content"][i]["body"], "html.parser")
-        md += f"\n***\n#### {data['content'][i]['author']}\n"
-        DFSParser(element)
-        i += 1
-
-    with open("data.md", "w") as f:
-        f.write(md)
-
-    # Translated: HTML
+        with open(f"./translated/markdown/{filename}.md", "w") as f:
+            f.write(md)
